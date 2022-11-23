@@ -34,6 +34,7 @@ void init_send()
 
 int client_send(char *pic)
 {
+    init_send();
     // sprintf(send_data, "%s", pic);
     send(sock, pic, SIZE_PHOTO, 0);
     return 0;
@@ -44,18 +45,18 @@ void photo(void *p)
     int num_photo = *(int *)p;
     DEBUG(("creat photo process started : num = %d", num_photo))
     // ouvertur de la connexion
-    init_send();
     // while nb de photo
     while (num_photo)
     {
-        // creat photo malloc (1000)
+        // creat photo malloc (SIZE_PHOTO)
         char *photo = malloc(SIZE_PHOTO);
         sprintf(photo,"photo %d\n", num_photo);
         // send photo port 5000
         client_send(photo);
+        DEBUG(("AFTER SEND"));
         // nb --
         num_photo--;
-        sleep(1);
+        free(photo);
     }
     // end while
 

@@ -1,12 +1,8 @@
 #include "main.h"
 
 #define SIZE_PHOTO 10
+extern pthread_mutex_t sync_rcv;
 
-int sock, connected, bytes_recieved, true = 1;
-char send_data[SIZE_PHOTO], recv_data[SIZE_PHOTO];
-
-struct sockaddr_in server_addr, client_addr;
-int sin_size;
 // process 2
 // ouvertur connexion port 6000
 // while nb photo
@@ -15,8 +11,14 @@ int sin_size;
 // nb--
 // end while
 // fermetur porte 6000
-void init_receive()
+
+void * client_receive(void * a)
 {
+    int sock, connected, bytes_recieved, true = 1;
+    char send_data[SIZE_PHOTO], recv_data[SIZE_PHOTO];
+
+    struct sockaddr_in server_addr, client_addr;
+    int sin_size;
 
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) == -1)
     {
@@ -49,25 +51,27 @@ void init_receive()
 
     printf("\nTCPServer Waiting for client on port 5000");
     fflush(stdout);
-}
+    printf("init_receive completed\n");
+    pthread_mutex_unlock(&sync_rcv);
 
-void *client_receive(void *a)
-{
+
     while (1)
     {
 
         sin_size = sizeof(struct sockaddr_in);
 
         connected = accept(sock, (struct sockaddr *)&client_addr, &sin_size);
+        
+        char * ip_client = inet_ntoa(client_addr.sin_addr);
 
-        printf("\n I got a connection from server(%s , %d) ",
+        printf("\n I got a connection from (%s , %d)\n",
                inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
 
         bytes_recieved = recv(connected, recv_data, SIZE_PHOTO, 0);
 
-        recv_data[bytes_recieved] = '\0';
-        printf("client: %d bytes received", bytes_recieved);
-
+        recv_data[bytes_recieved-1] = '\0';
+        printf("SERVER: %s\n", recv_data);
+        // ------ send back to the client 
         close(connected);
     }
 

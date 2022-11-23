@@ -1,17 +1,9 @@
 #include "main.h"
 
 FILE *logptr;
-extern void photo(void *p);
-void init_receive();
+void photo(void *p);
+
 void * client_receive(void * a);
-
-
-
-typedef struct process_info
-{
-    pthread_t pthread;
-    int id;
-} PROCESS_INFO;
 
 void _debug(const char *fmt, ...)
 {
@@ -20,6 +12,7 @@ void _debug(const char *fmt, ...)
     vfprintf(logptr, fmt, args);
     va_end(args);
 }
+pthread_mutex_t sync_rcv;
 
 // main function
 
@@ -41,9 +34,12 @@ int main(int argc, char **argv)
 
     // process : receive 
     pthread_t pthread2;
-    init_receive();
+    // init_receive();
+    pthread_mutex_lock(&sync_rcv);
     pthread_create(&pthread2, NULL,(void*)client_receive, NULL);
-    
+    pthread_mutex_lock(&sync_rcv);
+
+    printf ("Ready To receive\n");
 
     // process : send 
     pthread_t pthread;
@@ -57,7 +53,7 @@ int main(int argc, char **argv)
         sleep(1);
     }
     
-    // send to the server / to close the socket 
+    // send to the server / to close the socket ???
 }
 
 
