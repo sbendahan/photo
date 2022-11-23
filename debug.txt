@@ -1,0 +1,4 @@
+pp:36310 p:41907 client.c:32 App Started Arg count:1
+pp:36310 p:41907 client.c:35 Arg 0: ./client
+pp:36310 p:41907 client.c:40 NUM PHOTOS: 10
+pp:36310 p:41907 client_send.c:45 creat photo process started : num = 10
