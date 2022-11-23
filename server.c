@@ -67,10 +67,10 @@ int server_receive()
 
         bytes_recieved = recv(connected, recv_data, SIZE_PHOTO, 0);
 
-        recv_data[bytes_recieved] = '\0';
+        recv_data[bytes_recieved-1] = '\0';
         printf("SERVER: %s", recv_data);
         // ------ send back to the client 
-        // sleep(1);
+        sleep(1);
         server_send(recv_data,ip_client);
 
         close(connected);
@@ -114,6 +114,6 @@ int server_send(char* photo, char * ip_client)
     printf(" send to client ; %s", send_data);
     send(sock, send_data,strlen(send_data), 0);
     printf(" send after ; %s", send_data);
-
+    // close(connect);
     return 0;
 }
