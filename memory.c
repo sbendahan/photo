@@ -2,6 +2,7 @@
 #define PHOTO_SIZE 1000
 #define NUM_PHOTOS 50
 
+//test
 // struct photo_t contains photo and pointer to next
 typedef struct photo_t
 {
