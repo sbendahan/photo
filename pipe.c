@@ -4,6 +4,7 @@
 extern const char *semName ;
 extern const key_t key ;
 shmem_t *shm_ptr; // pointeur debut de shared memoire
+int init_shmem();
  
 int run_parent(int fd);
 
@@ -36,6 +37,7 @@ int main()
     }
     if (pid1 == (pid_t)0)
     {
+        init_shmem();
         while (1)
         {
             //  Close our copy of the write end of the file descriptor.
