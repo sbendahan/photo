@@ -6,10 +6,11 @@
 #include <stdlib.h>
 #include <stdarg.h>
 
+#include <sys/stat.h> /* For mode constants */
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-
+#include <semaphore.h>
 #include <string.h>
 #include <errno.h>
 #include <pthread.h>
@@ -34,6 +35,15 @@
 #include <unistd.h>
 #include <errno.h>
 #include <string.h>
+#include <fcntl.h>    /* For O_* constants */
+#include <sys/stat.h> /* For mode constants */
+
+#include <semaphore.h>
+#include <sys/wait.h>
+
+#include <sys/ipc.h>
+#include <sys/shm.h>
+
 //************ DEBUG ***************
 extern FILE *logptr;
 // extern process_t proc[4];

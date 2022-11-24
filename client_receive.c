@@ -62,6 +62,7 @@ void * client_receive(void * a)
 
         connected = accept(sock, (struct sockaddr *)&client_addr, &sin_size);
         
+        // 
         char * ip_client = inet_ntoa(client_addr.sin_addr);
 
         printf("\n I got a connection from (%s , %d)\n",
