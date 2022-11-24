@@ -4,64 +4,45 @@
 #define PHOTO_SIZE 20
 #define MAX_PHOTO 50
 
-// char photo[PHOTO_SIZE];
-typedef struct photo_t{
+typedef struct photo_t
+{
     char elemt[PHOTO_SIZE];
-}photo_t;
+} photo_t;
 typedef struct shmem_t
 {
     photo_t photo[MAX_PHOTO];
-    int count_in;
-    int count_out;
-    sem_t *sem_id; 
+    int count;
+    photo_t *ptr_head;
+    photo_t *ptr_tail;
+    sem_t *sem_id;
 } shmem_t;
 
 #define SHMSZ sizeof(shmem_t)
 
-
 /*************  Globals   *****************/
 const char *semName = "shmem";
-const key_t key= 5555;
+const key_t key = 5555;
 char c;
 int shmid;
-shmem_t *shm_ptr; // pointeur debut de shared memoire 
-
-
+shmem_t *shm_ptr; // pointeur debut de shared memoire
 
 /*************  Prototypes   *****************/
 int init_shm();
-int insert_sh_mem(char *photo, sem_t *sem_id, int index);
+int insert_sh_mem(char *photo);
 void print_shm(char *start);
 int server_send(char *data, char *ip_client);
-int server_receive();
-int server_sendphoto(void * photo);
+int server_receive(int fd);
+int server_sendphoto(void *photo);
+int run_parent(int fd);
 
-int main()
+int run_parent(int fd)
 {
-    printf("main started\n");
-    //initialize shared memory
     init_shm();
-    pid_t pid1 = fork();
-    if (pid1 < 0)
-    {
-        printf("error pid1");
-        exit(1);
-    }
-    if (pid1 == (pid_t)0)
-    {
-        //CHILD
-        char *p = "hello";
-        // traitement_pipe(p);
-        sleep(1);
-    }
-    else
-    {
-        server_receive();
-    }
+    server_receive(fd);
     return 0;
 }
 
-int server_receive()
+int server_receive(int fd)
 {
     int sock, connected, bytes_recieved, true = 1;
     char send_data[SIZE_PHOTO], recv_data[SIZE_PHOTO];
@@ -116,13 +97,19 @@ int server_receive()
         bytes_recieved = recv(connected, recv_data, SIZE_PHOTO, 0);
 
         // ------ send back to the client
-        for (int j=0;j<SIZE_PHOTO;j++){
+        for (int j = 0; j < SIZE_PHOTO; j++)
+        {
             printf("0x%0X, ", recv_data[j]);
             printf("\n");
         }
-        
-        insert_sh_mem(recv_data, shm_ptr->sem_id,shm_ptr->count_in);
 
+        // insert_sh_mem(recv_data, shm_ptr->sem_id,shm_ptr->count_in);
+        insert_sh_mem(recv_data);
+        //send to process child to treatement picture
+        if (write(fd, shm_ptr->ptr_head, sizeof(int)) < 0)
+        {
+            return 1; // error
+        }
         close(connected);
     }
 
@@ -174,8 +161,10 @@ int init_shm()
     // ----------------------------------------------------------------
 
     shm_ptr->sem_id = sem_open(semName, O_CREAT, 0600, 1);
-    shm_ptr->count_in=0;
-    shm_ptr->count_out=0;
+    shm_ptr->count = 0;
+    shm_ptr->ptr_head = shm_ptr->photo;
+    shm_ptr->ptr_tail = shm_ptr->photo;
+
     if (shm_ptr->sem_id == SEM_FAILED)
     {
         perror("Parent  : [sem_open] Failed\n");
@@ -201,7 +190,57 @@ int init_shm()
     // array_DB->photo=&shm;
     printf("server attached to memory START %p\n", shm_ptr);
 }
-int server_sendphoto(void * photo){
+
+int insert_sh_mem(char *photo)
+{
+
+    // ----------------------------------------------------------------
+    // ========= insert photo in shared memory =======
+    // ----------------------------------------------------------------
+
+    if (sem_wait(shm_ptr->sem_id) < 0)
+    {
+        perror(" [sem_wait] Failed\n");
+        exit(-2);
+    }
+    if (shm_ptr->count < MAX_PHOTO)
+    {
+        memcpy((shm_ptr->ptr_head), photo, PHOTO_SIZE);
+        shm_ptr->count++;
+        printf("adr : %p\n", shm_ptr->ptr_head);
+        shm_ptr->ptr_head++;
+        if (shm_ptr->ptr_head > &(shm_ptr->photo[MAX_PHOTO - 1]))
+        {
+            shm_ptr->ptr_head = shm_ptr->photo;
+        }
+    }
+    if (sem_post(sem_id) < 0)
+    {
+        perror(" [sem_post] Failed \n");
+        exit(-6);
+    }
+
+    return (0);
+}
+
+void close_shem(void)
+{
+    if (sem_close(shm_ptr->sem_id) != 0)
+    {
+        perror("Parent  : [sem_close] Failed\n");
+        exit(-3);
+    }
+
+    if (sem_unlink(semName) < 0)
+    {
+        perror("Parent  : [sem_unlink] Failed\n");
+        exit(-4);
+    }
+    printf("server is ending\n");
+}
+
+int server_sendphoto(void *photo)
+{
     //======================================
     // char * photo; //= "your photo";
     // strcpy(photo.photo, "data");
@@ -222,43 +261,4 @@ int server_sendphoto(void * photo){
     print_shm(&(shm_ptr->photo[0].elemt[0]));
     //======================================
     return 0;
-}
-
-void close_shem(void){
-    // if (sem_close(sem_id) != 0)
-    // {
-    //     perror("Parent  : [sem_close] Failed\n");
-    //     exit(-3);
-    // }
-
-    if (sem_unlink(semName) < 0)
-    {
-        perror("Parent  : [sem_unlink] Failed\n");
-        exit(-4);
-    }
-    printf("server is ending\n");
-}
-
-int insert_sh_mem(char *photo, sem_t *sem_id, int index)
-{
-
-    // ----------------------------------------------------------------
-    // ========= insert photo in shared memory =======
-    // ----------------------------------------------------------------
-
-    if (sem_wait(sem_id) < 0)
-    {
-        perror(" [sem_wait] Failed\n");
-        exit(-2);
-    }
-    memcpy(&(shm_ptr->photo[index].elemt[0]), photo,PHOTO_SIZE);
-    shm_ptr->count_in++;
-    printf("adr : %p\n", &(shm_ptr->photo[index].elemt[0]));
-    if (sem_post(sem_id) < 0)
-    {
-        perror(" [sem_post] Failed \n");
-        exit(-6);
-    }
-
-    return (0);
 }
