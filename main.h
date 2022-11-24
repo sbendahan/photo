@@ -1,6 +1,19 @@
 #ifndef MAIN_H
 #define MAIN_H
 
+
+
+/*************  includes     *****************/
+#include <pthread.h>
+#include <stdio.h>
+#include <stdlib.h> //used for exit
+#include <string.h>
+#include <sys/wait.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <assert.h>
+#include <error.h>
+
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -51,6 +64,24 @@ extern FILE *logptr;
 extern void _debug (const char *fmt, ...);
 
 #define DEBUG(X)     logptr = fopen("debug.txt","a");fprintf(logptr,"pp:%d p:%d %s:%d ",getppid(),getpid(),__FILE__, __LINE__); _debug X;fprintf(logptr, "\n");fclose(logptr);
+/*************  definitions     *****************/
+#define SIZE_PHOTO 10
+#define PHOTO_SIZE 20
+#define MAX_PHOTO 50
 
+typedef struct photo_t
+{
+    char elemt[PHOTO_SIZE];
+} photo_t;
+typedef struct shmem_t
+{
+    photo_t photo[MAX_PHOTO];
+    int count;
+    photo_t *ptr_head;
+    photo_t *ptr_tail;
+    sem_t *sem_id;
+} shmem_t;
+
+#define SHMSZ sizeof(shmem_t)
 
 #endif

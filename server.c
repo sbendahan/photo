@@ -1,23 +1,5 @@
 #include "main.h"
-/*************  definitions     *****************/
-#define SIZE_PHOTO 10
-#define PHOTO_SIZE 20
-#define MAX_PHOTO 50
 
-typedef struct photo_t
-{
-    char elemt[PHOTO_SIZE];
-} photo_t;
-typedef struct shmem_t
-{
-    photo_t photo[MAX_PHOTO];
-    int count;
-    photo_t *ptr_head;
-    photo_t *ptr_tail;
-    sem_t *sem_id;
-} shmem_t;
-
-#define SHMSZ sizeof(shmem_t)
 
 /*************  Globals   *****************/
 const char *semName = "shmem";
@@ -214,7 +196,7 @@ int insert_sh_mem(char *photo)
             shm_ptr->ptr_head = shm_ptr->photo;
         }
     }
-    if (sem_post(sem_id) < 0)
+    if (sem_post(shm_ptr->sem_id) < 0)
     {
         perror(" [sem_post] Failed \n");
         exit(-6);
