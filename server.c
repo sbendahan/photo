@@ -7,7 +7,7 @@ const key_t key = 5555;
 char c;
 int shmid;
 shmem_t *shm_ptr; // pointeur debut de shared memoire
-
+sem_t *sem_id;
 
 /*************  Prototypes   *****************/
 int init_shm();
@@ -143,7 +143,7 @@ int init_shm()
     // ========= define/creat shared memory =======
     // ----------------------------------------------------------------
 
-    sem_t *sem_id = sem_open(semName, O_CREAT, 0600, 0);
+    sem_id = sem_open(semName, O_CREAT, 0600, 0);
 
     if (sem_id == SEM_FAILED)
     {
@@ -181,7 +181,7 @@ int insert_sh_mem(char *photo)
     // ========= insert photo in shared memory =======
     // ----------------------------------------------------------------
 
-    if (sem_wait(shm_ptr->sem_id) < 0)
+    if (sem_wait(sem_id) < 0)
     {
         perror(" [sem_wait] Failed\n");
         exit(-2);
@@ -197,7 +197,7 @@ int insert_sh_mem(char *photo)
             shm_ptr->ptr_head = shm_ptr->photo;
         }
     }
-    if (sem_post(shm_ptr->sem_id) < 0)
+    if (sem_post(sem_id) < 0)
     {
         perror(" [sem_post] Failed \n");
         exit(-6);
@@ -208,7 +208,7 @@ int insert_sh_mem(char *photo)
 
 void close_shem(void)
 {
-    if (sem_close(shm_ptr->sem_id) != 0)
+    if (sem_close(sem_id) != 0)
     {
         perror("Parent  : [sem_close] Failed\n");
         exit(-3);

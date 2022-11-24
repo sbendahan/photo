@@ -79,7 +79,6 @@ typedef struct shmem_t
     int count;
     photo_t *ptr_head;
     photo_t *ptr_tail;
-    sem_t *sem_id;
 } shmem_t;
 
 #define SHMSZ sizeof(shmem_t)
