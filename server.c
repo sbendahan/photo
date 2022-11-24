@@ -8,6 +8,7 @@ char c;
 int shmid;
 shmem_t *shm_ptr; // pointeur debut de shared memoire
 
+
 /*************  Prototypes   *****************/
 int init_shm();
 int insert_sh_mem(char *photo);
@@ -142,12 +143,9 @@ int init_shm()
     // ========= define/creat shared memory =======
     // ----------------------------------------------------------------
 
-    shm_ptr->sem_id = sem_open(semName, O_CREAT, 0600, 1);
-    shm_ptr->count = 0;
-    shm_ptr->ptr_head = shm_ptr->photo;
-    shm_ptr->ptr_tail = shm_ptr->photo;
+    sem_t *sem_id = sem_open(semName, O_CREAT, 0600, 0);
 
-    if (shm_ptr->sem_id == SEM_FAILED)
+    if (sem_id == SEM_FAILED)
     {
         perror("Parent  : [sem_open] Failed\n");
         exit(-1);
@@ -168,6 +166,9 @@ int init_shm()
         perror("shmat");
         exit(1);
     }
+    shm_ptr->count = 0;
+    shm_ptr->ptr_head = shm_ptr->photo;
+    shm_ptr->ptr_tail = shm_ptr->photo;
 
     // array_DB->photo=&shm;
     printf("server attached to memory START %p\n", shm_ptr);

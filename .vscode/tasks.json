@@ -7,7 +7,8 @@
             "args": [
                 "-fdiagnostics-color=always",
                 "-g",
-                "pipe.c server.c",
+                "${file}",
+                "${fileDirname}/server.c",
                 "-o",
                 "${fileDirname}/${fileBasenameNoExtension}",
                 "-lpthread"

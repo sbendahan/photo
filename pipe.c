@@ -160,7 +160,7 @@ int init_shmem()
         exit(1);
     }
 	
-    if ((shm_ptr = shmat(shmid, NULL, 0)) == (char *) -1) {
+    if ((shm_ptr = shmat(shmid, NULL, 0)) == (shmem_t *) -1) {
         perror("shmat");
         exit(1);
     }
