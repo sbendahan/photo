@@ -3,31 +3,27 @@
 #define SIZE_PHOTO 10
 #define PHOTO_SIZE 1000
 #define MAX_PHOTO 50
-#define SHMSZ 50000
-typedef struct photo_t
-{
-    char photo[PHOTO_SIZE];
-} photo_t;
 
+// char photo[PHOTO_SIZE];
 typedef struct shmem_t
 {
-    photo_t p[PHOTO_SIZE];
+    char photo[MAX_PHOTO][PHOTO_SIZE];
     const char *semName;
     int count_in;
     int count_out;
 } shmem_t;
 
-photo_t array_DB[MAX_PHOTO];
+#define SHMSZ sizeof shmem_t
+
 
 /*************  Globals   *****************/
 const char *semName = "shmem";
 char c;
 int shmid;
-key_t key;
-char *shm;
-photo_t array_DB[MAX_PHOTO];
-shmem_t my_mem;
-#define SHMSZ sizeof(my_mem)
+key_t key= 5555;
+shmem_t *shm; // pointeur debut de shared memoir 
+
+
 
 /*************  Prototypes   *****************/
 int intit_shm();
@@ -115,8 +111,8 @@ int server_receive()
         recv_data[bytes_recieved - 1] = '\0';
         printf("SERVER: %s", recv_data);
         // ------ send back to the client
-        sleep(1);
-        server_send(recv_data, ip_client);
+        
+        insert_sh_mem(recv_data)
 
         close(connected);
     }
@@ -175,9 +171,6 @@ int intit_shm()
         perror("Parent  : [sem_open] Failed\n");
         exit(-1);
     }
-
-    // name our shared memory segment "5678".
-    key = 5555;
 
     //  Create the segment of shared memory
     // SHMSZ  => bits change en page
