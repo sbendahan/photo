@@ -2,7 +2,7 @@
 
 
 /*************  Globals   *****************/
-const char *semName = "shmem";
+const char *semName = "/shmem_sem";
 const key_t key = 5555;
 char c;
 int shmid;
@@ -145,13 +145,13 @@ int init_shm()
     // ========= define/creat shared memory =======
     // ----------------------------------------------------------------
 
-    // sem_id = sem_open(semName, O_CREAT, 0600, 0);
+    sem_id = sem_open(semName, O_CREAT, 0600, 1);
 
-    // if (sem_id == SEM_FAILED)
-    // {
-    //     perror("Parent  : [sem_open] Failed\n");
-    //     exit(-1);
-    // }
+    if (sem_id == SEM_FAILED)
+    {
+        perror("Parent  : [sem_open] Failed\n");
+        exit(-1);
+    }
 
     //  Create the segment of shared memory
     // SHMSZ  => bits change en page
@@ -214,17 +214,17 @@ int insert_sh_mem(char *photo, int fd)
 
 void close_shem(void)
 {
-    // if (sem_close(sem_id) != 0)
-    // {
-    //     perror("Parent  : [sem_close] Failed\n");
-    //     exit(-3);
-    // }
+    if (sem_close(sem_id) != 0)
+    {
+        perror("Parent  : [sem_close] Failed\n");
+        exit(-3);
+    }
 
-    // if (sem_unlink(semName) < 0)
-    // {
-    //     perror("Parent  : [sem_unlink] Failed\n");
-    //     exit(-4);
-    // }
+    if (sem_unlink(semName) < 0)
+    {
+        perror("Parent  : [sem_unlink] Failed\n");
+        exit(-4);
+    }
     printf("server is ending\n");
 }
 
@@ -251,3 +251,5 @@ int server_sendphoto(void *photo)
     //======================================
     return 0;
 }
+
+

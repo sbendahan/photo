@@ -14,9 +14,11 @@ int run_parent(int fd);
 int main()
 {
 
+    char ch;
+
     int fds[3][2];
     int i;
-    pid_t pid1, pid2, pid3;
+    pid_t pid1, pid2, pid3,pid4;
 
     // Create a pipe. File descriptors for the two ends of the pipe are placed in fds
     for (i = 0; i < 3; i++)
@@ -135,20 +137,46 @@ int main()
 
     /************ PARENT process *****************/ // INC + send to UART1
 
-    close(fds[0][0]);
-    close(fds[1][0]);
-    close(fds[1][1]);
-    close(fds[2][1]);
-    close(fds[2][0]);
+    pid4 = fork();
+    if (pid4 < 0)
+    {
+        printf("error pid1");
+        exit(1);
+    }
+    if (pid4 == (pid_t)0)
+    {
+        close(fds[0][0]);
+        close(fds[1][0]);
+        close(fds[1][1]);
+        close(fds[2][1]);
+        close(fds[2][0]);
 
-    run_parent(fds[0][1]);
+        run_parent(fds[0][1]);
 
-    close(fds[0][1]);
+        close(fds[0][1]);
+        exit(0);
 
-    waitpid(pid1, NULL, 0);
-    waitpid(pid2, NULL, 0);
-    waitpid(pid3, NULL, 0);
+    }
 
+        close(fds[0][0]);
+        close(fds[0][1]);
+        close(fds[1][0]);
+        close(fds[1][1]);
+        close(fds[2][0]);
+        close(fds[2][1]);
+    printf("Enter q to stop application\n");
+    while ((ch = getchar()) != 'q')
+    {
+        sleep(1);
+    }
+    kill(pid1, SIGKILL);
+    kill(pid2, SIGKILL);
+    kill(pid3, SIGKILL);
+    kill(pid4, SIGKILL);
+    // waitpid(pid4, NULL, 0);
+    // waitpid(pid1, NULL, 0);
+    // waitpid(pid2, NULL, 0);
+    // waitpid(pid3, NULL, 0);
     return 0;
 }
 
@@ -158,7 +186,7 @@ int init_shmem()
     int retval;
 
     printf("main started\n");
-    sem_t *sem_id = sem_open(semName, O_CREAT, 0600, 0);
+    sem_t *sem_id = sem_open(semName, O_CREAT, 0600, 1);
 
     if (sem_id == SEM_FAILED)
     {
