@@ -1,11 +1,11 @@
 #include "main.h"
 
 /*************  main() function ****************/
-extern const char *semName ;
-extern const key_t key ;
+extern const char *semName;
+extern const key_t key;
 shmem_t *shm_ptr; // pointeur debut de shared memoire
 int init_shmem();
- 
+
 int run_parent(int fd);
 
 // we have 4 process and 3 pipes
@@ -27,7 +27,7 @@ int main()
         }
     }
 
-    /************ Fork process 1 *****************/ //fft
+    /************ Fork process 1 *****************/ // fft
 
     pid1 = fork();
     if (pid1 < 0)
@@ -37,90 +37,101 @@ int main()
     }
     if (pid1 == (pid_t)0)
     {
+        // child 1
         init_shmem();
+
+        //  Close our copy of the write end of the file descriptor.
+        close(fds[0][1]); // fermetur write du pere
+        close(fds[1][0]); // fermeture lecture du fils
+        close(fds[2][0]); // fermeture de write fork2
+        close(fds[2][1]); // fermeture lecture fork2
         while (1)
         {
-            //  Close our copy of the write end of the file descriptor.
-            close(fds[0][1]);
-            close(fds[1][0]);
-            close(fds[2][0]);
-            close(fds[2][1]);
             // read data
-            void* ptr;
+            void *ptr;
             if (read(fds[0][0], &ptr, sizeof(ptr)) < 0)
             {
                 exit(1); // error
             }
             // data += 5; // do operation on the photo;
             printf("child1: %p\n", ptr);
-            if (write(fds[1][1], ptr, sizeof(ptr)) < 0)
+            if (write(fds[1][1], &ptr, sizeof(ptr)) < 0)
             {
                 exit(1); // error
             }
-            close(fds[0][0]);
-            close(fds[1][1]);
-            
+            sleep(1);
         }
+
+        close(fds[0][0]);
+        close(fds[1][1]);
+        exit(0);
     }
 
-    /************ Fork process 2 *****************/ // FFT
+    /************ Fork process 2 *****************/ // dev
 
-    // pid2 = fork();
-    // if (pid2 < 0)
-    // {
-    //     printf("error pid1");
-    //     exit(1);
-    // }
-    // if (pid2 == (pid_t)0)
-    // {
-    //     while (1)
-    //     {
-    //         close(fds[0][0]);
-    //         close(fds[0][1]);
-    //         close(fds[1][1]);
-    //         close(fds[2][0]);
-    //         // read data
-    //         char*data;
-    //         if (read(fds[1][0], data, sizeof(data)) < 0)
-    //         {
-    //             return 1; // error
-    //         }
-    //         data += 2 * 5; // do operation on the photo;
-    //         printf("child2: %d\n", data);
-    //         if (write(fds[2][1], data, sizeof(data)) < 0)
-    //         {
-    //             return 1; // error
-    //         }
-    //         close(fds[1][0]);
-    //         close(fds[2][1]);
-    //     }
-    // }
+    pid2 = fork();
+    if (pid2 < 0)
+    {
+        printf("error pid1");
+        exit(1);
+    }
+    if (pid2 == (pid_t)0)
+    {
 
-    /************ Fork process 2 *****************/ // DEV
+        init_shmem();
+        close(fds[0][0]);
+        close(fds[0][1]);
+        close(fds[1][1]);
+        close(fds[2][0]);
+        while (1)
+        { // read data
+            void *ptr;
+            if (read(fds[1][0], &ptr, sizeof(ptr)) < 0)
+            {
+                exit(1); // error
+            }
+            // data += 5; // do operation on the photo;
+            printf("child2: %p\n", ptr);
+            if (write(fds[2][1], &ptr, sizeof(ptr)) < 0)
+            {
+                exit(1); // error
+            }
+            sleep(1);
+        }
 
-    // pid3 = fork();
-    // if (pid3 < 0)
-    // {
-    //     printf("error pid1");
-    //     exit(1);
-    // }
-    // if (pid3 == (pid_t)0)
-    // {
-    //     while(1){
-    //         close(fds[0][0]);
-    //         close(fds[1][0]);
-    //         close(fds[1][1]);
-    //         close(fds[2][1]);
-    //         close(fds[0][1]);
-    //         int data; // do operation on the photo;
-    //         if (read(fds[2][0], &data, sizeof(int)) < 0)
-    //         {
-    //             return 1; // error
-    //         }
-    //         printf("the data is: %d\n", data);
-    //         close(fds[2][0]);
-    //     }
-    // }
+        close(fds[1][0]);
+        close(fds[2][1]);
+        exit(0);
+    }
+
+    /************ Fork process 3 *****************/ // id >>>>> uart1
+
+    pid3 = fork();
+    if (pid3 < 0)
+    {
+        printf("error pid1");
+        exit(1);
+    }
+    if (pid3 == (pid_t)0)
+    {
+
+        init_shmem();
+        close(fds[0][0]);
+        close(fds[0][1]);
+        close(fds[1][0]);
+        close(fds[1][1]);
+        close(fds[2][1]);
+        while (1)
+        {
+            void *ptr; // do operation on the photo;
+            if (read(fds[2][0], &ptr, sizeof(int)) < 0)
+            {
+                return 1; // error
+            }
+            printf("the data is: %p\n", ptr);
+        }
+        close(fds[2][0]);
+    }
 
     /************ PARENT process *****************/ // INC + send to UART1
 
@@ -132,7 +143,6 @@ int main()
 
     run_parent(fds[0][1]);
 
-
     close(fds[0][1]);
 
     waitpid(pid1, NULL, 0);
@@ -142,29 +152,29 @@ int main()
     return 0;
 }
 
-
-
 int init_shmem()
 {
     int shmid;
-	int retval;
-	
-	printf("main started\n");
+    int retval;
+
+    printf("main started\n");
     sem_t *sem_id = sem_open(semName, O_CREAT, 0600, 0);
-	
-    if (sem_id == SEM_FAILED){
-        perror("Child   : [sem_open] Failed\n"); 
+
+    if (sem_id == SEM_FAILED)
+    {
+        perror("Child   : [sem_open] Failed\n");
         exit(-5);
-        
     }
-    if ((shmid = shmget(key, SHMSZ, 0666)) < 0) {
+    if ((shmid = shmget(key, SHMSZ, 0666)) < 0)
+    {
         perror("shmget");
         exit(1);
     }
-	
-    if ((shm_ptr = shmat(shmid, NULL, 0)) == (shmem_t *) -1) {
+
+    if ((shm_ptr = shmat(shmid, NULL, 0)) == (shmem_t *)-1)
+    {
         perror("shmat");
         exit(1);
     }
-    printf("client attached to memory %p\n",shm_ptr);
+    printf("client attached to memory %p\n", shm_ptr);
 }

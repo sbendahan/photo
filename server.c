@@ -145,13 +145,13 @@ int init_shm()
     // ========= define/creat shared memory =======
     // ----------------------------------------------------------------
 
-    sem_id = sem_open(semName, O_CREAT, 0600, 0);
+    // sem_id = sem_open(semName, O_CREAT, 0600, 0);
 
-    if (sem_id == SEM_FAILED)
-    {
-        perror("Parent  : [sem_open] Failed\n");
-        exit(-1);
-    }
+    // if (sem_id == SEM_FAILED)
+    // {
+    //     perror("Parent  : [sem_open] Failed\n");
+    //     exit(-1);
+    // }
 
     //  Create the segment of shared memory
     // SHMSZ  => bits change en page
@@ -182,11 +182,11 @@ int insert_sh_mem(char *photo, int fd)
     // ----------------------------------------------------------------
     // ========= insert photo in shared memory =======
     // ----------------------------------------------------------------
-        if (sem_wait(sem_id) < 0)
-    {
-        perror(" [sem_wait] Failed\n");
-        exit(-2);
-    }
+    //     if (sem_wait(sem_id) < 0)
+    // {
+    //     perror(" [sem_wait] Failed\n");
+    //     exit(-2);
+    // }
         memcpy((shm_ptr->ptr_head), photo, PHOTO_SIZE);
         if (write(fd, &(shm_ptr->ptr_head), sizeof(int)) < 0)
         {
@@ -203,28 +203,28 @@ int insert_sh_mem(char *photo, int fd)
             shm_ptr->ptr_head = shm_ptr->photo;
         }
     }
-    if (sem_post(sem_id) < 0)
-    {
-        perror(" [sem_post] Failed \n");
-        exit(-6);
-    }
+    // if (sem_post(sem_id) < 0)
+    // {
+    //     perror(" [sem_post] Failed \n");
+    //     exit(-6);
+    // }
 
     return (0);
 }
 
 void close_shem(void)
 {
-    if (sem_close(sem_id) != 0)
-    {
-        perror("Parent  : [sem_close] Failed\n");
-        exit(-3);
-    }
+    // if (sem_close(sem_id) != 0)
+    // {
+    //     perror("Parent  : [sem_close] Failed\n");
+    //     exit(-3);
+    // }
 
-    if (sem_unlink(semName) < 0)
-    {
-        perror("Parent  : [sem_unlink] Failed\n");
-        exit(-4);
-    }
+    // if (sem_unlink(semName) < 0)
+    // {
+    //     perror("Parent  : [sem_unlink] Failed\n");
+    //     exit(-4);
+    // }
     printf("server is ending\n");
 }
 
