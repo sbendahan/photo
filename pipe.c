@@ -131,7 +131,7 @@ int main()
     close(fds[2][0]);
 
     run_parent(fds[0][1]);
-    int data = 0;
+
 
     close(fds[0][1]);
 

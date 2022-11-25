@@ -11,7 +11,7 @@ sem_t *sem_id;
 
 /*************  Prototypes   *****************/
 int init_shm();
-int insert_sh_mem(char *photo);
+int insert_sh_mem(char *photo, int fd);
 void print_shm(char *start);
 int server_send(char *data, char *ip_client);
 int server_receive(int fd);
@@ -87,12 +87,14 @@ int server_receive(int fd)
         }
 
         // insert_sh_mem(recv_data, shm_ptr->sem_id,shm_ptr->count_in);
-        insert_sh_mem(recv_data);
-        //send to process child to treatement picture
-        if (write(fd, shm_ptr->ptr_head, sizeof(int)) < 0)
-        {
-            return 1; // error
-        }
+        insert_sh_mem(recv_data, fd);
+                        //  int data2=0;
+            // if (write(fd, &data2, sizeof(data2)) < 0)
+            // {
+            //     return 1; // error
+            // }
+       //send to process child to treatement picture
+
         close(connected);
     }
 
@@ -174,21 +176,25 @@ int init_shm()
     printf("server attached to memory START %p\n", shm_ptr);
 }
 
-int insert_sh_mem(char *photo)
+int insert_sh_mem(char *photo, int fd)
 {
 
     // ----------------------------------------------------------------
     // ========= insert photo in shared memory =======
     // ----------------------------------------------------------------
-
-    if (sem_wait(sem_id) < 0)
+        if (sem_wait(sem_id) < 0)
     {
         perror(" [sem_wait] Failed\n");
         exit(-2);
     }
+        memcpy((shm_ptr->ptr_head), photo, PHOTO_SIZE);
+        if (write(fd, &(shm_ptr->ptr_head), sizeof(int)) < 0)
+        {
+            return 1; // error
+        }
+
     if (shm_ptr->count < MAX_PHOTO)
     {
-        memcpy((shm_ptr->ptr_head), photo, PHOTO_SIZE);
         shm_ptr->count++;
         printf("adr : %p\n", shm_ptr->ptr_head);
         shm_ptr->ptr_head++;
