@@ -83,17 +83,11 @@ int server_receive(int fd)
         for (int j = 0; j < SIZE_PHOTO; j++)
         {
             printf("0x%0X, ", recv_data[j]);
-            printf("\n");
         }
+            printf("\n");
 
-        // insert_sh_mem(recv_data, shm_ptr->sem_id,shm_ptr->count_in);
+       //insert and send to process child to treatement picture
         insert_sh_mem(recv_data, fd);
-                        //  int data2=0;
-            // if (write(fd, &data2, sizeof(data2)) < 0)
-            // {
-            //     return 1; // error
-            // }
-       //send to process child to treatement picture
 
         close(connected);
     }
@@ -188,7 +182,7 @@ int insert_sh_mem(char *photo, int fd)
     //     exit(-2);
     // }
         memcpy((shm_ptr->ptr_head), photo, PHOTO_SIZE);
-        if (write(fd, &(shm_ptr->ptr_head), sizeof(int)) < 0)
+        if (write(fd, (void *)&(shm_ptr->ptr_head), sizeof(void *)) < 0)
         {
             return 1; // error
         }
