@@ -5,6 +5,8 @@ extern const char *semName;
 extern const key_t key;
 shmem_t *shm_ptr; // pointeur debut de shared memoire
 int init_shmem();
+int remove_sh_mem(char *photo);
+
 
 int run_parent(int fd);
 
@@ -127,11 +129,15 @@ int main()
         while (1)
         {
             void *ptr; // do operation on the photo;
-            if (read(fds[2][0], &ptr, sizeof(int)) < 0)
+            if (read(fds[2][0], &ptr, sizeof(ptr)) < 0)
             {
                 return 1; // error
             }
-            printf("child 3: %p\n", ptr);
+            printf("child3: %p\n", ptr);
+            // sleep(5);
+            remove_sh_mem(ptr);
+
+
         }
         close(fds[2][0]);
     }

@@ -17,6 +17,8 @@ int server_send(char *data, char *ip_client);
 int server_receive(int fd);
 int server_sendphoto(void *photo);
 int run_parent(int fd);
+int remove_sh_mem(char *photo);
+
 
 int run_parent(int fd)
 {
@@ -79,7 +81,7 @@ int server_receive(int fd)
 
         bytes_recieved = recv(connected, recv_data, SIZE_PHOTO, 0);
 
-        // ------ send back to the client
+        // ------ print --------------------------------
         for (int j = 0; j < SIZE_PHOTO; j++)
         {
             printf("0x%0X, ", recv_data[j]);
@@ -196,6 +198,43 @@ int insert_sh_mem(char *photo, int fd)
         {
             shm_ptr->ptr_head = shm_ptr->photo;
         }
+    }
+    // if (sem_post(sem_id) < 0)
+    // {
+    //     perror(" [sem_post] Failed \n");
+    //     exit(-6);
+    // }
+
+    return (0);
+}
+
+
+
+int remove_sh_mem(char *photo)
+{
+
+    // ----------------------------------------------------------------
+    // ========= remove photo from shared memory =======
+    // ----------------------------------------------------------------
+    //     if (sem_wait(sem_id) < 0)
+    // {
+    //     perror(" [sem_wait] Failed\n");
+    //     exit(-2);
+    // }
+    memcpy((shm_ptr->ptr_tail), photo, PHOTO_SIZE);
+
+    if (shm_ptr->count != 0)
+    {
+        shm_ptr->count--;
+        printf("adr : %p\n", shm_ptr->ptr_tail);
+        shm_ptr->ptr_tail++;
+        if (shm_ptr->ptr_tail > &(shm_ptr->photo[MAX_PHOTO - 1]))
+        {
+            shm_ptr->ptr_tail = shm_ptr->photo;
+        }
+    }
+    else{
+        printf("error to remove photo - the queue is empty\n");
     }
     // if (sem_post(sem_id) < 0)
     // {
