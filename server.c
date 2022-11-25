@@ -228,28 +228,5 @@ void close_shem(void)
     printf("server is ending\n");
 }
 
-int server_sendphoto(void *photo)
-{
-    //======================================
-    // char * photo; //= "your photo";
-    // strcpy(photo.photo, "data");
-    // char *array_DB = (photo_t *)shm;
-
-    printf("adress 1 %p\n", photo);
-
-    // memcpy
-    int count = 0;
-    while (1)
-    {
-        while (count < 50)
-        {
-            // insert_sh_mem(&photo, sem_id, count);
-            count++;
-        }
-    }
-    print_shm(&(shm_ptr->photo[0].elemt[0]));
-    //======================================
-    return 0;
-}
 
 

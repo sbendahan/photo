@@ -18,7 +18,7 @@ int main()
 
     int fds[3][2];
     int i;
-    pid_t pid1, pid2, pid3,pid4;
+    pid_t pid1, pid2, pid3, pid4;
 
     // Create a pipe. File descriptors for the two ends of the pipe are placed in fds
     for (i = 0; i < 3; i++)
@@ -50,13 +50,14 @@ int main()
         while (1)
         {
             // read data
-            void *ptr;
+            char *ptr;
             if (read(fds[0][0], &ptr, sizeof(ptr)) < 0)
             {
                 exit(1); // error
             }
             // data += 5; // do operation on the photo;
             printf("child1: %p\n", ptr);
+          
             if (write(fds[1][1], &ptr, sizeof(ptr)) < 0)
             {
                 exit(1); // error
@@ -130,7 +131,7 @@ int main()
             {
                 return 1; // error
             }
-            printf("the data is: %p\n", ptr);
+            printf("child 3: %p\n", ptr);
         }
         close(fds[2][0]);
     }
@@ -155,15 +156,14 @@ int main()
 
         close(fds[0][1]);
         exit(0);
-
     }
 
-        close(fds[0][0]);
-        close(fds[0][1]);
-        close(fds[1][0]);
-        close(fds[1][1]);
-        close(fds[2][0]);
-        close(fds[2][1]);
+    close(fds[0][0]);
+    close(fds[0][1]);
+    close(fds[1][0]);
+    close(fds[1][1]);
+    close(fds[2][0]);
+    close(fds[2][1]);
     printf("Enter q to stop application\n");
     while ((ch = getchar()) != 'q')
     {
