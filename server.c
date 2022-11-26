@@ -19,8 +19,13 @@ int run_parent(int fd);
 int remove_sh_mem(char *photo);
 void config_serial(int fd_serial);
 void uart1_send(char *photo);
+void send_respons(char*resp);
 // char* uart2_receive();
+void uart2_receive();
 
+void send_respons(char*resp){
+    server_send(resp,shm_ptr->client_ip);
+}
 int run_parent(int fd)
 {
     creat_shm();
@@ -204,7 +209,7 @@ int insert_sh_mem(char *photo, int fd)
             exit(-6);
         }
         // printf("insert/ release semaphor \n");
-        // printf("insert to adr : %p\n", shm_ptr->ptr_head);
+        printf("insert to adr : %p\n", shm_ptr->ptr_head);
         shm_ptr->ptr_head++;
         if (shm_ptr->ptr_head > &(shm_ptr->photo[MAX_PHOTO - 1]))
         {
@@ -328,27 +333,72 @@ void uart1_send(char *photo)
     close(fd_serial1); // Close Port
 }
 
-// char* uart2_receive()
+void uart2_receive()
+{
+    int ret, fd_serial2;
+    struct termios options; // baud rate => debit
+    int n;
+    char rx_buff[255];
+    fd_serial2 = open(SERIAL_DEVFILE_2, O_RDWR | O_NOCTTY | O_NDELAY); /* <--- serial port 2 */
+    if (fd_serial2 == -1)
+    {
+        printf("ERROR Open Serial Port 2!");
+        exit(-1);
+    }
+    // Serial Configuration
+    config_serial(fd_serial2);
+    // reading serial port into rx-buffer
+    ret = read(fd_serial2, rx_buff, strlen(rx_buff));
+    if (ret == -1)
+    {
+        perror("Error writing to device");
+        exit(EXIT_FAILURE);
+    }
+    server_send(rx_buff,shm_ptr->client_ip);
+    close(fd_serial2); // Close Port
+    // return rx_buff;
+}
+
+
+
+// void uart1_send(char *photo)
 // {
-//     int ret, fd_serial2;
-//     struct termios options; // baud rate => debit
-//     int n;
-//     char rx_buff[255];
-//     fd_serial2 = open(SERIAL_DEVFILE_2, O_RDWR | O_NOCTTY | O_NDELAY); /* <--- serial port 2 */
-//     if (fd_serial2 == -1)
-//     {
-//         printf("ERROR Open Serial Port 2!");
-//         exit(-1);
-//     }
-//     // Serial Configuration
-//     config_serial(fd_serial2);
-//     // reading serial port into rx-buffer
-//     ret = read(fd_serial2, rx_buff, strlen(rx_buff));
-//     if (ret == -1)
-//     {
-//         perror("Error writing to device");
+//     char *device_uart1="/dev/ttyS1";
+//     int fd;
+//     int file;
+//     fd=open(device_uart1,O_WRONLY);
+//     if(fd<0){
+//         printf("ERROR on opening %s\n",device_uart1);
 //         exit(EXIT_FAILURE);
 //     }
-//     close(fd_serial2); // Close Port
-//     return rx_buff;
+//     file=write(fd,photo,sizeof(photo));
+//     if(file<0){
+//         printf("error on writing");
+//         exit(EXIT_FAILURE);
+//     }
+//     sleep(1);
+//     close(fd);
 // }
+
+// void uart2_receive()
+// {
+//     int fd2;
+//     int file2;
+//     char*data;
+//     char *device_uart2="/dev/ttyS2";
+//     fd2=open(device_uart2,O_RDONLY);
+//     if(fd2<0){
+//         printf("ERROR on opening %s\n",device_uart2);
+//         exit(EXIT_FAILURE);
+//     }
+//      file2=read(fd2,data,sizeof(char));
+//     if(file2<0){
+//         printf("error on reading");
+//         exit(EXIT_FAILURE);
+//     }
+//     server_send(data,shm_ptr->client_ip);
+//     close(fd2);
+   
+// }
+
+

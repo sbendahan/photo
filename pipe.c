@@ -1,20 +1,25 @@
 #include "main.h"
 
-/*************  main() function ****************/
+/************* global ****************/
 extern const char *semName;
 extern const key_t key;
 extern shmem_t *shm_ptr; // pointeur debut de shared memoire
-enum {CAT=1, MOUSE, DOG};
+enum
+{
+    CAT = 1,
+    MOUSE,
+    DOG
+};
+/*************  prototypes ****************/
 int init_shmem();
 int remove_sh_mem(char *photo);
-// void uart1_send(char *photo);
-// char* uart2_receive();
+void uart1_send(char *photo);
 int server_send(char *data, char *ip_client);
-
-
+void send_respons(char*resp);
+void uart2_receive();
 int run_parent(int fd);
 
-// we have 4 process and 3 pipes
+/************* SERVER main() function ****************/
 
 int main()
 {
@@ -22,7 +27,7 @@ int main()
     char ch;
     int fds[3][2];
     int i;
-    char* tx;
+    char *tx;
     pid_t pid1, pid2, pid3, pid4;
 
     //  ************** open PIPE **********************
@@ -61,7 +66,7 @@ int main()
             {
                 exit(1); // error
             }
-            // data += 5; // do operation on the photo;
+            // TODO // do operation on the photo;
             printf("FFT: %p\n", ptr);
 
             if (write(fds[1][1], &ptr, sizeof(ptr)) < 0)
@@ -99,7 +104,7 @@ int main()
             {
                 exit(1); // error
             }
-            // data += 5; // do operation on the photo;
+            //TODO // do operation on the photo;
             printf("CONV: %p\n", ptr);
             if (write(fds[2][1], &ptr, sizeof(ptr)) < 0)
             {
@@ -132,41 +137,36 @@ int main()
         close(fds[2][1]);
         while (1)
         {
-            void *ptr; // do operation on the photo;
-            char resp[10];
-            int x = random() % 3;
+            void *ptr; 
+            int x = random() % 3+1;
+            char*resp;
+            printf("x= %d\n",x);
             if (read(fds[2][0], &ptr, sizeof(ptr)) < 0)
             {
                 return 1; // error
             }
             printf("ID: %p\n", ptr);
+        
             // sleep(5);
-            // switch (x)
-            // {
-            // case CAT:
-            //     sprintf(resp,"CAT");
-            //     // uart1_send(resp);
-            //     server_send(resp,shm_ptr->client_ip);
-            //     break;
-            // case MOUSE:
-            //     sprintf(resp,"MOUSE");
-            //     // uart1_send(resp);
-            //     server_send(resp,shm_ptr->client_ip);
-            //     break;
-            // case DOG:
-            //     sprintf(resp,"DOG");
-            //     // uart1_send(resp);
-            //     server_send(resp,shm_ptr->client_ip);
-            //     break;
-            // default:
-            //     break;
-            // }
-            
-            // printf("child3: after switch\n");
-
+            if (x == 1)
+            {
+                strcpy(resp, "CAT");
+                printf( "%s\n",resp);
+                uart1_send(resp);
+            }
+            else if (x == 2)
+            {
+                strcpy(resp, "MOUSE");
+                printf( "%s\n",resp);
+                uart1_send(resp);
+            }
+            else if (x == 3)
+            {
+                strcpy(resp, "DOG");
+                printf( "%s\n",resp);
+                uart1_send(resp);
+            }
             remove_sh_mem(ptr);
-            // printf("child3: after remove\n");
-
         }
         close(fds[2][0]);
     }
@@ -195,10 +195,7 @@ int main()
 
     /************ parent process *****************/ // quit app
 
-    // char* ttx=uart2_receive();
-    // strcpy(tx,ttx);
-    // server_send(tx, char *ip_client);
-    // printf("the pic is: %s\n",tx);
+    uart2_receive();
     close(fds[0][0]);
     close(fds[0][1]);
     close(fds[1][0]);
