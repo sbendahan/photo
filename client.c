@@ -27,7 +27,7 @@ int main(int argc, char **argv)
     {
         DEBUG(("Arg %d: %s", i, argv[i]));
     }
-    const int NUM_PHOTO = 10;
+    const int NUM_PHOTO = 10; //>>>>>>>>>>num photo that we send to the server 
     int num_photo = NUM_PHOTO;
 
     DEBUG(("NUM PHOTOS: %d", num_photo));

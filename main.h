@@ -1,8 +1,6 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-
-
 /*************  includes     *****************/
 #include <pthread.h>
 #include <stdio.h>
@@ -13,10 +11,7 @@
 #include <unistd.h>
 #include <assert.h>
 #include <error.h>
-
-#include <stdio.h>
-#include <unistd.h>
-#include <stdlib.h>
+#include <termios.h> //use for uart
 #include <stdarg.h>
 
 #include <sys/stat.h> /* For mode constants */
@@ -43,7 +38,6 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <errno.h>
@@ -67,18 +61,22 @@ extern void _debug (const char *fmt, ...);
 /*************  definitions     *****************/
 #define SIZE_PHOTO 10
 #define PHOTO_SIZE 20
-#define MAX_PHOTO 50
+#define MAX_PHOTO 5
+
+#define SERIAL_DEVFILE_1 "/dev/ttyS1"
+#define SERIAL_DEVFILE_2 "/dev/ttyS2"
 
 typedef struct photo_t
 {
     char elemt[PHOTO_SIZE];
 } photo_t;
-typedef struct shmem_t
+typedef struct shmem_t  // shared memory struct
 {
     photo_t photo[MAX_PHOTO];
-    int count;
-    photo_t *ptr_head;
-    photo_t *ptr_tail;
+    int count;         // counter of photo in sh mem
+    photo_t *ptr_head; // ptr to add in shared mem
+    photo_t *ptr_tail; // ptr to read & remove to shared mem
+    char* client_ip;
 } shmem_t;
 
 #define SHMSZ sizeof(shmem_t)

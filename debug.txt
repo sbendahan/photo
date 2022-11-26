@@ -1,14 +1,19 @@
-pp:3909 p:5199 client.c:25 App Started Arg count:1
-pp:3909 p:5199 client.c:28 Arg 0: ./client
-pp:3909 p:5199 client.c:33 NUM PHOTOS: 10
-pp:3909 p:5199 client_send.c:46 creat photo process started : num = 10
-pp:3909 p:5199 client_send.c:56 AFTER SEND
-pp:3909 p:5199 client_send.c:56 AFTER SEND
-pp:3909 p:5199 client_send.c:56 AFTER SEND
-pp:3909 p:5199 client_send.c:56 AFTER SEND
-pp:3909 p:5199 client_send.c:56 AFTER SEND
-pp:3909 p:5199 client_send.c:56 AFTER SEND
-pp:3909 p:5199 client_send.c:56 AFTER SEND
-pp:3909 p:5199 client_send.c:56 AFTER SEND
-pp:3909 p:5199 client_send.c:56 AFTER SEND
-pp:3909 p:5199 client_send.c:56 AFTER SEND
+pp:2792 p:7927 client.c:25 App Started Arg count:1
+pp:2792 p:7927 client.c:28 Arg 0: ./client
+pp:2792 p:7927 client.c:33 NUM PHOTOS: 15
+pp:2792 p:7927 client_send.c:46 creat photo process started : num = 15
+pp:2792 p:7927 client_send.c:56 AFTER SEND
+pp:2792 p:7927 client_send.c:56 AFTER SEND
+pp:2792 p:7927 client_send.c:56 AFTER SEND
+pp:2792 p:7927 client_send.c:56 AFTER SEND
+pp:2792 p:7927 client_send.c:56 AFTER SEND
+pp:2792 p:7927 client_send.c:56 AFTER SEND
+pp:2792 p:7927 client_send.c:56 AFTER SEND
+pp:2792 p:7927 client_send.c:56 AFTER SEND
+pp:2792 p:7927 client_send.c:56 AFTER SEND
+pp:2792 p:7927 client_send.c:56 AFTER SEND
+pp:2792 p:7927 client_send.c:56 AFTER SEND
+pp:2792 p:7927 client_send.c:56 AFTER SEND
+pp:2792 p:7927 client_send.c:56 AFTER SEND
+pp:2792 p:7927 client_send.c:56 AFTER SEND
+pp:2792 p:7927 client_send.c:56 AFTER SEND

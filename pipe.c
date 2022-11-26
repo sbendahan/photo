@@ -3,25 +3,29 @@
 /*************  main() function ****************/
 extern const char *semName;
 extern const key_t key;
-shmem_t *shm_ptr; // pointeur debut de shared memoire
+extern shmem_t *shm_ptr; // pointeur debut de shared memoire
+enum {CAT=1, MOUSE, DOG};
 int init_shmem();
 int remove_sh_mem(char *photo);
+// void uart1_send(char *photo);
+// char* uart2_receive();
+int server_send(char *data, char *ip_client);
 
 
 int run_parent(int fd);
 
 // we have 4 process and 3 pipes
-// TODO : do the prog in loop
 
 int main()
 {
 
     char ch;
-
     int fds[3][2];
     int i;
+    char* tx;
     pid_t pid1, pid2, pid3, pid4;
 
+    //  ************** open PIPE **********************
     // Create a pipe. File descriptors for the two ends of the pipe are placed in fds
     for (i = 0; i < 3; i++)
     {
@@ -45,10 +49,10 @@ int main()
         init_shmem();
 
         //  Close our copy of the write end of the file descriptor.
-        close(fds[0][1]); // fermetur write du pere
-        close(fds[1][0]); // fermeture lecture du fils
-        close(fds[2][0]); // fermeture de write fork2
-        close(fds[2][1]); // fermeture lecture fork2
+        close(fds[0][1]); // close write parent
+        close(fds[1][0]); // close read child
+        close(fds[2][0]); // close  write fork2
+        close(fds[2][1]); // close read fork2
         while (1)
         {
             // read data
@@ -58,8 +62,8 @@ int main()
                 exit(1); // error
             }
             // data += 5; // do operation on the photo;
-            printf("child1: %p\n", ptr);
-          
+            printf("FFT: %p\n", ptr);
+
             if (write(fds[1][1], &ptr, sizeof(ptr)) < 0)
             {
                 exit(1); // error
@@ -96,7 +100,7 @@ int main()
                 exit(1); // error
             }
             // data += 5; // do operation on the photo;
-            printf("child2: %p\n", ptr);
+            printf("CONV: %p\n", ptr);
             if (write(fds[2][1], &ptr, sizeof(ptr)) < 0)
             {
                 exit(1); // error
@@ -129,20 +133,45 @@ int main()
         while (1)
         {
             void *ptr; // do operation on the photo;
+            char resp[10];
+            int x = random() % 3;
             if (read(fds[2][0], &ptr, sizeof(ptr)) < 0)
             {
                 return 1; // error
             }
-            printf("child3: %p\n", ptr);
+            printf("ID: %p\n", ptr);
             // sleep(5);
-            remove_sh_mem(ptr);
+            // switch (x)
+            // {
+            // case CAT:
+            //     sprintf(resp,"CAT");
+            //     // uart1_send(resp);
+            //     server_send(resp,shm_ptr->client_ip);
+            //     break;
+            // case MOUSE:
+            //     sprintf(resp,"MOUSE");
+            //     // uart1_send(resp);
+            //     server_send(resp,shm_ptr->client_ip);
+            //     break;
+            // case DOG:
+            //     sprintf(resp,"DOG");
+            //     // uart1_send(resp);
+            //     server_send(resp,shm_ptr->client_ip);
+            //     break;
+            // default:
+            //     break;
+            // }
+            
+            // printf("child3: after switch\n");
 
+            remove_sh_mem(ptr);
+            // printf("child3: after remove\n");
 
         }
         close(fds[2][0]);
     }
 
-    /************ PARENT process *****************/ // INC + send to UART1
+    /************ fork 4 :TCP process *****************/ // connection TCP
 
     pid4 = fork();
     if (pid4 < 0)
@@ -164,6 +193,12 @@ int main()
         exit(0);
     }
 
+    /************ parent process *****************/ // quit app
+
+    // char* ttx=uart2_receive();
+    // strcpy(tx,ttx);
+    // server_send(tx, char *ip_client);
+    // printf("the pic is: %s\n",tx);
     close(fds[0][0]);
     close(fds[0][1]);
     close(fds[1][0]);

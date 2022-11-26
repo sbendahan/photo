@@ -57,6 +57,7 @@ void photo(void *p)
         // nb --
         num_photo--;
         free(photo);
+        // sleep(2);
     }
     // end while
 
