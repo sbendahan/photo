@@ -72,7 +72,9 @@ void * client_receive(void * a)
 
         bytes_recieved = recv(connected, recv_data, SIZE_PHOTO, 0);
 
-        recv_data[bytes_recieved-1] = '\0';
+        // recv_data[bytes_recieved-1] = '\0';
+        recv_data[bytes_recieved] = '\0';
+
         printf("SERVER: %s\n", recv_data);
         // ------ send back to the client 
         close(connected);

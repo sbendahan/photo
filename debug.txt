@@ -1,14 +1,14 @@
-pp:27463 p:28217 client.c:25 App Started Arg count:1
-pp:27463 p:28217 client.c:28 Arg 0: ./client
-pp:27463 p:28217 client.c:33 NUM PHOTOS: 10
-pp:27463 p:28217 client_send.c:47 creat photo process started : num = 10
-pp:27463 p:28217 client_send.c:57 AFTER SEND
-pp:27463 p:28217 client_send.c:57 AFTER SEND
-pp:27463 p:28217 client_send.c:57 AFTER SEND
-pp:27463 p:28217 client_send.c:57 AFTER SEND
-pp:27463 p:28217 client_send.c:57 AFTER SEND
-pp:27463 p:28217 client_send.c:57 AFTER SEND
-pp:27463 p:28217 client_send.c:57 AFTER SEND
-pp:27463 p:28217 client_send.c:57 AFTER SEND
-pp:27463 p:28217 client_send.c:57 AFTER SEND
-pp:27463 p:28217 client_send.c:57 AFTER SEND
+pp:27463 p:29817 client.c:25 App Started Arg count:1
+pp:27463 p:29817 client.c:28 Arg 0: ./client
+pp:27463 p:29817 client.c:33 NUM PHOTOS: 10
+pp:27463 p:29817 client_send.c:47 creat photo process started : num = 10
+pp:27463 p:29817 client_send.c:57 AFTER SEND
+pp:27463 p:29817 client_send.c:57 AFTER SEND
+pp:27463 p:29817 client_send.c:57 AFTER SEND
+pp:27463 p:29817 client_send.c:57 AFTER SEND
+pp:27463 p:29817 client_send.c:57 AFTER SEND
+pp:27463 p:29817 client_send.c:57 AFTER SEND
+pp:27463 p:29817 client_send.c:57 AFTER SEND
+pp:27463 p:29817 client_send.c:57 AFTER SEND
+pp:27463 p:29817 client_send.c:57 AFTER SEND
+pp:27463 p:29817 client_send.c:57 AFTER SEND

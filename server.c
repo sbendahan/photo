@@ -220,7 +220,7 @@ int insert_sh_mem(char *photo, int fd)
         }
     }
     else{
-        char*message ="full memory";
+        char*message ="full mem";
         printf("ip client: %s\n",shm_ptr->client_ip);
        
         // server_send(message,shm_ptr->client_ip);
