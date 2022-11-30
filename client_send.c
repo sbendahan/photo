@@ -1,7 +1,8 @@
 
 #include "main.h"
 
-#define SIZE_PHOTO 10
+// #define SIZE_PHOTO 1000
+ #define SIZE_PHOTO 10
 
 int sock, bytes_recieved;
 char send_data[1024], recv_data[1024];

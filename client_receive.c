@@ -1,6 +1,8 @@
 #include "main.h"
 
+// #define SIZE_PHOTO 1000
 #define SIZE_PHOTO 10
+
 extern pthread_mutex_t sync_rcv;
 
 // process 2

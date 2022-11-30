@@ -19,13 +19,12 @@ int run_parent(int fd);
 int remove_sh_mem(char *photo);
 void config_serial(int fd_serial);
 void uart1_send(char *photo);
-void send_respons(char*resp);
+// void send_respons(char*resp);
+void send_respons();
 // char* uart2_receive();
 void uart2_receive();
 
-void send_respons(char*resp){
-    server_send(resp,shm_ptr->client_ip);
-}
+
 int run_parent(int fd)
 {
     creat_shm();
@@ -281,6 +280,14 @@ void close_shem(void)
     }
     printf("server is ending\n");
 }
+
+
+void send_respons(char*resp){
+    strcpy(resp,"hey i send");
+    server_send(resp,shm_ptr->client_ip);
+}
+
+
 
 void config_serial(int fd_serial)
 {

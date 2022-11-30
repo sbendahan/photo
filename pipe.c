@@ -139,33 +139,40 @@ int main()
         {
             void *ptr; 
             int x = random() % 3+1;
-            char*resp;
-            printf("x= %d\n",x);
+            char resp[10];
+            // printf("x= %d\n",x);
             if (read(fds[2][0], &ptr, sizeof(ptr)) < 0)
             {
                 return 1; // error
             }
             printf("ID: %p\n", ptr);
-        
+            // send_respons(resp);
             // sleep(5);
             if (x == 1)
             {
+                
                 strcpy(resp, "CAT");
                 printf( "%s\n",resp);
-                uart1_send(resp);
+                // uart1_send(resp);
+                // send_respons(resp);
             }
             else if (x == 2)
             {
                 strcpy(resp, "MOUSE");
                 printf( "%s\n",resp);
-                uart1_send(resp);
+                // uart1_send(resp);
+                // send_respons(resp);
             }
             else if (x == 3)
             {
                 strcpy(resp, "DOG");
                 printf( "%s\n",resp);
-                uart1_send(resp);
-            }
+                // uart1_send(resp);
+                // send_respons(resp);
+            }                
+            puts("");
+
+
             remove_sh_mem(ptr);
         }
         close(fds[2][0]);
@@ -195,7 +202,7 @@ int main()
 
     /************ parent process *****************/ // quit app
 
-    uart2_receive();
+    // uart2_receive();
     close(fds[0][0]);
     close(fds[0][1]);
     close(fds[1][0]);

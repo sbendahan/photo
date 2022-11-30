@@ -59,8 +59,12 @@ extern void _debug (const char *fmt, ...);
 
 #define DEBUG(X)     logptr = fopen("debug.txt","a");fprintf(logptr,"pp:%d p:%d %s:%d ",getppid(),getpid(),__FILE__, __LINE__); _debug X;fprintf(logptr, "\n");fclose(logptr);
 /*************  definitions     *****************/
+// #define SIZE_PHOTO 1000
+// #define PHOTO_SIZE 1000
+// #define MAX_PHOTO 50
+
 #define SIZE_PHOTO 10
-#define PHOTO_SIZE 20
+#define PHOTO_SIZE 10
 #define MAX_PHOTO 5
 
 #define SERIAL_DEVFILE_1 "/dev/ttyS1"
