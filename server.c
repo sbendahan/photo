@@ -12,17 +12,16 @@ sem_t *sem_id;
 int creat_shm();
 int insert_sh_mem(char *photo, int fd);
 void print_shm(char *start);
-int server_send(char *data, char *ip_client);
+int server_send(char *photo);
 int server_receive(int fd);
 int server_sendphoto(void *photo);
 int run_parent(int fd);
 int remove_sh_mem(char *photo);
 void config_serial(int fd_serial);
 void uart1_send(char *photo);
-// void send_respons(char*resp);
-void send_respons();
 // char* uart2_receive();
 void uart2_receive();
+
 
 
 int run_parent(int fd)
@@ -80,7 +79,8 @@ int server_receive(int fd)
         connected = accept(sock, (struct sockaddr *)&client_addr, &sin_size);
 
         char *ip_client = inet_ntoa(client_addr.sin_addr);
-        shm_ptr->client_ip=ip_client;
+        // shm_ptr->client_ip=*ip_client;
+        strcpy(shm_ptr->client_ip,ip_client);
 
         // printf("\n I got a connection from (%s , %d)",
         //        inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
@@ -104,7 +104,9 @@ int server_receive(int fd)
     return 0;
 }
 
-int server_send(char *photo, char *ip_client)
+// int server_send(char *photo, char *ip_client)
+int server_send(char *photo)
+
 {
 
     int sock, bytes_recieved;
@@ -113,7 +115,9 @@ int server_send(char *photo, char *ip_client)
     struct sockaddr_in server_addr;
 
     // host = gethostbyname("127.0.0.1");
-    host = gethostbyname(ip_client);
+    // host = gethostbyname(ip_client);
+    host = gethostbyname(shm_ptr->client_ip);
+
 
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) == -1)
     {
@@ -217,7 +221,11 @@ int insert_sh_mem(char *photo, int fd)
     }
     else{
         char*message ="full memory";
-        server_send(message,shm_ptr->client_ip);
+        printf("ip client: %s\n",shm_ptr->client_ip);
+       
+        // server_send(message,shm_ptr->client_ip);
+        server_send(message);
+
     }
 
     return (0);
@@ -282,10 +290,7 @@ void close_shem(void)
 }
 
 
-void send_respons(char*resp){
-    strcpy(resp,"hey i send");
-    server_send(resp,shm_ptr->client_ip);
-}
+
 
 
 
@@ -361,7 +366,7 @@ void uart2_receive()
         perror("Error writing to device");
         exit(EXIT_FAILURE);
     }
-    server_send(rx_buff,shm_ptr->client_ip);
+    server_send(rx_buff);
     close(fd_serial2); // Close Port
     // return rx_buff;
 }

@@ -73,14 +73,16 @@ extern void _debug (const char *fmt, ...);
 typedef struct photo_t
 {
     char elemt[PHOTO_SIZE];
+    //ip client for many users 
 } photo_t;
+
 typedef struct shmem_t  // shared memory struct
 {
     photo_t photo[MAX_PHOTO];
     int count;         // counter of photo in sh mem
     photo_t *ptr_head; // ptr to add in shared mem
     photo_t *ptr_tail; // ptr to read & remove to shared mem
-    char* client_ip;
+    char client_ip[20];
 } shmem_t;
 
 #define SHMSZ sizeof(shmem_t)

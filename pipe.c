@@ -14,10 +14,12 @@ enum
 int init_shmem();
 int remove_sh_mem(char *photo);
 void uart1_send(char *photo);
-int server_send(char *data, char *ip_client);
-void send_respons(char*resp);
+// int server_send(char *data, char *ip_client);
+int server_send(char *photo);
 void uart2_receive();
 int run_parent(int fd);
+// void send_respons(char*resp);
+void send_respons();
 
 /************* SERVER main() function ****************/
 
@@ -140,35 +142,38 @@ int main()
             void *ptr; 
             int x = random() % 3+1;
             char resp[10];
-            // printf("x= %d\n",x);
             if (read(fds[2][0], &ptr, sizeof(ptr)) < 0)
             {
                 return 1; // error
             }
             printf("ID: %p\n", ptr);
-            // send_respons(resp);
-            // sleep(5);
+         
             if (x == 1)
             {
                 
-                strcpy(resp, "CAT");
+                strcpy(resp, "CAT\0");
                 printf( "%s\n",resp);
                 // uart1_send(resp);
-                // send_respons(resp);
+                server_send(resp);
+
+
             }
             else if (x == 2)
             {
-                strcpy(resp, "MOUSE");
+                strcpy(resp, "MOUSE\0");
                 printf( "%s\n",resp);
                 // uart1_send(resp);
-                // send_respons(resp);
+                server_send(resp);
+
+
             }
             else if (x == 3)
             {
-                strcpy(resp, "DOG");
+                strcpy(resp, "DOG\0");
                 printf( "%s\n",resp);
                 // uart1_send(resp);
-                // send_respons(resp);
+                server_send(resp);
+
             }                
             puts("");
 
